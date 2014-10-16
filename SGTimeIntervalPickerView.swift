@@ -40,14 +40,35 @@ class SGTimeIntervalPickerView: UIPickerView, UIPickerViewDelegate {
     
     //MARK: Setup
     
-    func sharedInit() {
+    private func sharedInit() {
         dataSource = self
         delegate = self
     }
     
+    //MARK: Selection
+    
+    func selectTimeInterval(timeInterval: NSTimeInterval, animated: Bool) {
+        precondition(timeInterval >= minimumTimeInterval, "Cannot select a time interval which is less than the mimimumTimeInterval")
+        precondition(timeInterval <= maximumTimeInterval, "Cannot select a time interval which is greater than the maximumTimeInterval")
+        var time = componentsFromTimeInterval(timeInterval)
+        selectRow(time.0, inComponent: 0, animated: animated)
+        selectRow(time.1, inComponent: 1, animated: animated)
+        selectRow(time.2, inComponent: 2, animated: animated)
+    }
+    
     //MARK: Helpers
     
-    func selectionIsValid(row: Int, component: Int) -> Bool {
+    private func componentsFromTimeInterval(timeInterval: NSTimeInterval) -> (Int, Int, Int) {
+        var time: (Int, Int, Int) = (0, 0, 0)
+        
+        time.0 = Int(abs(timeInterval/3600))
+        time.1 = Int(abs(timeInterval/60 % 60))
+        time.2 = Int(abs(timeInterval%60))
+        
+        return time
+    }
+    
+    private func selectionIsValid(row: Int, component: Int) -> Bool {
         let hours = selectedRowInComponent(0) * 3600
         let minutes = selectedRowInComponent(1) * 60
         let seconds = selectedRowInComponent(2)
@@ -78,9 +99,9 @@ extension SGTimeIntervalPickerView: UIPickerViewDataSource {
         case 0: //Hours
             return maxTimeIntervalInSeconds / 3600 + 1
         case 1: //Minutes
-            return min(maxTimeIntervalInSeconds / 60, 60)
+            return max(1, min(maxTimeIntervalInSeconds / 60, 60))
         default: //seconds
-            return min(maxTimeIntervalInSeconds, 60)
+            return max(1, min(maxTimeIntervalInSeconds, 60))
         }
     }
 }
