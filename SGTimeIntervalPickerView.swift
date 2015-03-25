@@ -7,25 +7,12 @@
 
 import UIKit
 
-protocol SGTimeIntervalPickerViewDelegate: NSObjectProtocol {
-    func pickerView(pickerView: UIPickerView, didSelectTimeInterval: NSTimeInterval)
-}
-
 class SGTimeIntervalPickerView: UIPickerView, UIPickerViewDelegate {
     
-    weak var timeIntervalDelegate: SGTimeIntervalPickerViewDelegate?
-    
     var minimumTimeInterval: NSTimeInterval = 0
+    var maximumTimeInterval: NSTimeInterval = 86400
     
-    var _maximumTimeInterval: NSTimeInterval = 86400
-    var maximumTimeInterval: NSTimeInterval{
-        set(timeInterval) {
-            _maximumTimeInterval = min(timeInterval, 86400)
-        }
-        get {
-            return _maximumTimeInterval
-        }
-    }
+    var timeIntervalSelectedClosure: ((timeInterval: NSTimeInterval) -> ())?
     
     //MARK: Init
     required init(coder aDecoder: NSCoder) {
@@ -147,8 +134,8 @@ extension SGTimeIntervalPickerView: UIPickerViewDelegate {
         
         pickerView.reloadAllComponents()
         
-        if let unDelegate = timeIntervalDelegate {
-            unDelegate.pickerView(pickerView, didSelectTimeInterval: timeInterval)
+        if let closure = timeIntervalSelectedClosure {
+            closure(timeInterval: timeInterval)
         }
     }
 }
