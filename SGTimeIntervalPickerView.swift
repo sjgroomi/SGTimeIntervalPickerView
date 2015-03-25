@@ -10,7 +10,15 @@ import UIKit
 class SGTimeIntervalPickerView: UIPickerView, UIPickerViewDelegate {
     
     var minimumTimeInterval: NSTimeInterval = 0
-    var maximumTimeInterval: NSTimeInterval = 86400
+    var _maximumTimeInterval: NSTimeInterval = 86400
+    var maximumTimeInterval: NSTimeInterval{
+        set(timeInterval) {
+            _maximumTimeInterval = min(timeInterval, 86400)
+        }
+        get {
+            return _maximumTimeInterval
+        }
+    }
     
     var timeIntervalSelectedClosure: ((timeInterval: NSTimeInterval) -> ())?
     
